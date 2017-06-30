@@ -10,23 +10,26 @@
 <body>
 
 <div ng-app="myApp" ng-controller="customersCtrl">
+    <div ng-bind="myName"></div>
  <input placeholder="search" ng-model="searchQuery" name="searcQuery"/>
 <form name="myForm">
-<input type="text" id="newItem" name="newItem" ng-required="true" ng-model="newItem" ng-focus="clearMsg()" />
+<input placeholder="write down your item.." type="text" id="newItem" name="newItem" ng-required="true" ng-model="newItem" ng-focus="clearMsg()" />
 <button ng-click="addItem()" ng-disabled="myForm.newItem.$error.required">+</button>
 
 </form>
 <div ng-show="showError">{{errorMsg}}</div>
 <ul>
-    <li ng-repeat="list in shoppingList | filter:searchQuery">
-        <input type="text" id="list_edit_field_{{$index}}" ng-model="list" style="display:none" class="edit-mode-off"/>
-        <input type="checkbox" name="markItemDone-{{$index}}" id="mark_item_done_{{$index}}" ng-click="checkedItem($index)" />
-        <span id="item_text_{{$index}}" class="test-class">{{list}} </span>
+    <li ng-repeat="list in shoppingList  | filter:searchQuery track by $index">
+        <input type="text" id="list_edit_field_{{$index}}" ng-model="list.itemName" style="display:none" class="edit-mode-off"/>
+        <input type="checkbox" name="markItemDone-{{$index}}" id="mark_item_done_{{$index}}" ng-click="checkedItem($index)" ng-checked="list.itemChecked" />
+        <span id="item_text_{{$index}}" ng-class="{'marked-item' : list.itemChecked}">{{list.itemName}} / status:{{list.itemChecked}} </span>
         <button ng-click="" id="remove_btn_{{$index}}" confirmed-click="removeItem($index)" 
-    ng-confirm-click="Are you sure want to delete {{list}} ?" >X</button>
-        <button ng-click="editItem($index)" id="edit_btn_{{$index}}">edit</button>
+    ng-confirm-click="Are you sure want to delete {{list.itemName}} ?" ng-hide="list.itemChecked" >X</button>
+        <button ng-click="editItem($index)" id="edit_btn_{{$index}}" ng-hide="list.itemChecked">edit</button>
     </li> 
 </ul>
+<div id ="item_counter" class="counter">{{( shoppingList | filter: { itemChecked:false } ).length}} item(s) are in the list</div>
+<div>{{( shoppingList | filter: { itemChecked:true } ).length}} item(s) are done</div>
 
 </div>
 

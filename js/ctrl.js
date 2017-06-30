@@ -1,23 +1,30 @@
+
 app.controller('customersCtrl', function($scope, $location) {
     $scope.myUrl = $location.absUrl();
+    $scope.myName = "mohamed";
     $scope.showError = false;
     $scope.editModeOn = false;
     $scope.errorMsg = "item already exists";
-    $scope.shoppingList;
-    if(localStorage["mycars"].length == 0)
+    
+    $scope.shoppingList=[];
+    
+    if(localStorage["storeShoppingList"].length == 0)
     {
-        $scope.shoppingList = [];
+       $scope.shoppingList = [
+            {
+                itemName:'',
+                itemChecked : false
+            }
+        ];
         alert("empty list");
     }
     //$scope.shoppingList = ['milk','chocolate','banana'];
     else{
-        $scope.shoppingList = JSON.parse(localStorage["mycars"]);
+        $scope.shoppingList = JSON.parse(localStorage["storeShoppingList"]);
+        console.log($scope.shoppingList)
     }
 
-    //localStorage.setItem("localShoppingList", JSON.stringify($scope.shoppingList));
-    //var retrievedData = localStorage.getItem("localShoppingList");
-    //$scope.shoppingListRetrieved = JSON.parse(retrievedData);
-      //localStorage["mycars"] = JSON.stringify($scope.shoppingList);
+    
    //add item function
     $scope.addItem = function(){
         if($scope.shoppingList.indexOf($scope.newItem) !== -1) {
@@ -26,9 +33,13 @@ app.controller('customersCtrl', function($scope, $location) {
         }
         else
             {   
-                $scope.shoppingList.push($scope.newItem);
+                $scope.shoppingList.push({
+                    itemName : $scope.newItem,
+                    itemChecked : false
+                })
+                
                 $scope.showError = false;  
-                localStorage["mycars"] = JSON.stringify($scope.shoppingList);
+                localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList);
                 //localStorage.setItem("localShoppingList", JSON.stringify(shoppingList)); 
             }
         $scope.newItem = null; //to empty the text field after adding the item
@@ -36,7 +47,7 @@ app.controller('customersCtrl', function($scope, $location) {
     // remove item function
     $scope.removeItem = function(index){
         $scope.shoppingList.splice(index,1);
-         localStorage["mycars"] = JSON.stringify($scope.shoppingList);
+        localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList);
     }
     //clear item field function
     $scope.clearMsg = function(){
@@ -69,6 +80,11 @@ app.controller('customersCtrl', function($scope, $location) {
             }
         else
             alert("error");
+            editedItemText.value = editField.value;
+            $scope.shoppingList[index].itemName = editedItemText.value;
+            
+            localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList);
+        
     }
     //checked item function
     $scope.checkedItem = function(index){
@@ -76,21 +92,28 @@ app.controller('customersCtrl', function($scope, $location) {
         var itemToBeChecked= document.getElementById("mark_item_done_"+index);
         var editedItemText= document.getElementById("item_text_"+index);
         var editDoneBtn = document.getElementById("edit_btn_"+index);
-        var removeItem = document.getElementById("remove_btn_"+index)
+        var removeItem = document.getElementById("remove_btn_"+index);
         if(itemToBeChecked.checked == true)
             {
+               console.log("item is checked");
                 editedItemText.classList.add("marked-item");
-                editDoneBtn.hidden = true;
-                removeItem.hidden = true;
+                //editDoneBtn.hidden = true;
+                //removeItem.hidden = true;
+                $scope.shoppingList[index].itemChecked = true;
             }
         else
             {
+                console.log("item is not checked");
                 editedItemText.classList.remove("marked-item");
-                editDoneBtn.hidden = false;
-                removeItem.hidden = false;
-            }   
-    }
+                //editDoneBtn.hidden = false;
+                //removeItem.hidden = false;
+                $scope.shoppingList[index].itemChecked = false;
+            }  
+             localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList); 
 
+       // return localStorage["storeShoppingList"].itemChecked;
+    }
+   
    
 });
 app.directive('ngConfirmClick', [
