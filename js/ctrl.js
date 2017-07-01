@@ -6,6 +6,17 @@ app.controller('customersCtrl', function($scope, $location) {
     $scope.editModeOn = false;
     $scope.errorMsg = "item already exists";
     
+    $scope.checkAll = localStorage.getItem('checkedStatus');
+    //alert("initial value of check alll is "+ localStorage.getItem('checkedStatus'));
+    //$scope.date = new Date();
+    //clock area
+    $scope.clock = {clock : new Date()}
+    var updateClock = function () {$scope.clock.now = new Date();};
+    setInterval(function () {$scope.$apply(updateClock);}, 1000);
+    updateClock();
+    //end of clock
+
+
     $scope.shoppingList=[];
     
     if(localStorage["storeShoppingList"].length == 0)
@@ -13,7 +24,8 @@ app.controller('customersCtrl', function($scope, $location) {
        $scope.shoppingList = [
             {
                 itemName:'',
-                itemChecked : false
+                itemChecked : false,
+                checkedTime : ''
             }
         ];
         alert("empty list");
@@ -21,7 +33,7 @@ app.controller('customersCtrl', function($scope, $location) {
     //$scope.shoppingList = ['milk','chocolate','banana'];
     else{
         $scope.shoppingList = JSON.parse(localStorage["storeShoppingList"]);
-        console.log($scope.shoppingList)
+      
     }
 
     
@@ -87,33 +99,55 @@ app.controller('customersCtrl', function($scope, $location) {
         
     }
     //checked item function
-    $scope.checkedItem = function(index){
-
+    $scope.checkedItem = function(index,checkedNowDate){
+        //alert(checkedNowDate);
         var itemToBeChecked= document.getElementById("mark_item_done_"+index);
         var editedItemText= document.getElementById("item_text_"+index);
         var editDoneBtn = document.getElementById("edit_btn_"+index);
         var removeItem = document.getElementById("remove_btn_"+index);
         if(itemToBeChecked.checked == true)
             {
-               console.log("item is checked");
+               
                 editedItemText.classList.add("marked-item");
                 //editDoneBtn.hidden = true;
                 //removeItem.hidden = true;
                 $scope.shoppingList[index].itemChecked = true;
+                $scope.shoppingList[index].checkedTime = checkedNowDate;
+                
             }
         else
             {
-                console.log("item is not checked");
+               
                 editedItemText.classList.remove("marked-item");
                 //editDoneBtn.hidden = false;
                 //removeItem.hidden = false;
                 $scope.shoppingList[index].itemChecked = false;
+                $scope.shoppingList[index].checkedTime = '';
             }  
-             localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList); 
+             localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList);
+             $scope.checkAll = false;
+             //alert($scope.checkAll );
+              localStorage.setItem('checkedStatus',$scope.checkAll);
 
        // return localStorage["storeShoppingList"].itemChecked;
     }
    
+
+   $scope.checkAllItem = function(checkedStatus,checkedNowDate){
+      alert(checkedStatus);
+       angular.forEach($scope.shoppingList, function(value, key) {
+            //console.log(key + ': ' + value.itemName);
+            if(checkedStatus)
+                $scope.shoppingList[key].itemChecked = true;
+            else
+                $scope.shoppingList[key].itemChecked = false;
+            //$scope.checkedItem(key,checkedNowDate);
+        });
+        $scope.checkAll = checkedStatus;
+        localStorage.setItem('checkedStatus',checkedStatus);
+        //alert("inside check all"+localStorage.getItem('checkedStatus'));
+        localStorage["storeShoppingList"] = JSON.stringify($scope.shoppingList);
+   }
    
 });
 app.directive('ngConfirmClick', [
